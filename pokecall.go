@@ -16,7 +16,6 @@ type locationpage struct {
 	} `json:"results"`
 }
 
-
 func makeGetLocationArea(conf *config) func() error {
 	return func() error {
 		if conf.next == "" {
@@ -57,7 +56,6 @@ func GetPrevLocationArea(conf *config) func() error {
 		}
 		return nil
 	}
-
 
 }
 
