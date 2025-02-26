@@ -10,6 +10,7 @@ import ("strings"
 type config struct {
 	prev		string
 	next		string
+	location	string
 }
 
 type cliCommand struct {
@@ -51,7 +52,11 @@ func main() {
 	locconf  := &config{
 				prev: "",
 				next: "https://pokeapi.co/api/v2/location-area"}
-	cache := internal.NewCache(5 * time.Second)
+	visconf := &config{
+				prev: "https://pokeapi.co/api/v2/location-area",
+				next: ""}
+	
+	cache := internal.NewCache(15 * time.Second)
 
 	// Step 2: Now add commands to the map, using the completed map
 	m["exit"] = cliCommand{
@@ -78,6 +83,13 @@ func main() {
 		config:		 locconf,
 		callback:    GetPrevLocationArea(locconf, cache),
 	}
+	m["explore"] = cliCommand{
+		name:		 "explore {location}",
+		description: "Explore the given location",
+		config:		 locconf,
+		callback:    GetLocationData(visconf, cache),
+	}
+	
 
 	input := bufio.NewScanner(os.Stdin)
 	commands := []string{}
@@ -91,6 +103,9 @@ func main() {
 		commands = cleanInput(text)
 		if len(commands) > 0 {
 			command = commands[0]
+			if len(commands) > 1 {
+				visconf.next = commands[1]
+			}
 			_, exists := m[command]
 			if exists {
 				err := m[command].callback()
