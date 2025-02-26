@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"github.com/kalinith/pokedex/internal"
 )
 
 type locationpage struct {
@@ -16,12 +17,12 @@ type locationpage struct {
 	} `json:"results"`
 }
 
-func makeGetLocationArea(conf *config) func() error {
+func makeGetLocationArea(conf *config, cache *internal.Cache) func() error {
 	return func() error {
 		if conf.next == "" {
 			return fmt.Errorf("you're on the last page")
 		}
-		body, err := apiCall(conf.next)
+		body, err := apiCall(conf.next, cache)
 		if err != nil {
 			return err
 		}
@@ -37,12 +38,12 @@ func makeGetLocationArea(conf *config) func() error {
 	}
 }
 
-func GetPrevLocationArea(conf *config) func() error {
+func GetPrevLocationArea(conf *config, cache *internal.Cache) func() error {
 	return func() error {
 		if conf.prev == "" {
 			return fmt.Errorf("you're on the first page")
 		}
-		body, err := apiCall(conf.prev)
+		body, err := apiCall(conf.prev, cache)
 		if err != nil {
 			return err
 		}
@@ -59,7 +60,12 @@ func GetPrevLocationArea(conf *config) func() error {
 
 }
 
-func apiCall(url string) ([]byte, error) {
+func apiCall(url string, cache *internal.Cache) ([]byte, error) {
+	cachebody, iscached := cache.Get(url)
+	if iscached {
+		fmt.Println("received data from Cache")
+		return cachebody, nil
+	}
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -71,7 +77,9 @@ func apiCall(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	cache.Add(url, body)
+	fmt.Println("received data from API")
 	return body, nil
-	
 }
 

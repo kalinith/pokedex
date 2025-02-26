@@ -3,6 +3,8 @@ import ("strings"
 	"fmt"
 	"bufio"
 	"os"
+	"time"
+	"github.com/kalinith/pokedex/internal"
 	)
 
 type config struct {
@@ -49,6 +51,7 @@ func main() {
 	locconf  := &config{
 				prev: "",
 				next: "https://pokeapi.co/api/v2/location-area"}
+	cache := internal.NewCache(5 * time.Second)
 
 	// Step 2: Now add commands to the map, using the completed map
 	m["exit"] = cliCommand{
@@ -67,13 +70,13 @@ func main() {
 		name:        "map",
 		description: "Display the next page of locations from the world",
 		config:		 locconf,
-		callback:    makeGetLocationArea(locconf),
+		callback:    makeGetLocationArea(locconf, cache),
 	}
 	m["mapb"]  = cliCommand{
 		name:        "mapb",
 		description: "Display previous page of locations from the world",
 		config:		 locconf,
-		callback:    GetPrevLocationArea(locconf),
+		callback:    GetPrevLocationArea(locconf, cache),
 	}
 
 	input := bufio.NewScanner(os.Stdin)
