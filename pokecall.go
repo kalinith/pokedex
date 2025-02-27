@@ -350,8 +350,13 @@ func makeGetLocationArea(conf *config, cache *internal.Cache) func() error {
 		if err != nil {
 			return err
 		}
+
 		locationdata := LocationPage{}
-		json.Unmarshal(body, &locationdata)
+		err = json.Unmarshal(body, &locationdata)
+		if err != nil {
+			return err
+		}
+
 		conf.prev = (locationdata.Previous)
 		conf.next = locationdata.Next
 
@@ -371,8 +376,13 @@ func GetPrevLocationArea(conf *config, cache *internal.Cache) func() error {
 		if err != nil {
 			return err
 		}
+
 		locationdata := LocationPage{}
-		json.Unmarshal(body, &locationdata)
+		err = json.Unmarshal(body, &locationdata)
+		if err != nil {
+			return err
+		}
+
 		conf.prev = (locationdata.Previous)
 		conf.next = locationdata.Next
 
@@ -394,8 +404,12 @@ func GetLocationData(conf *config, cache *internal.Cache) func() error {
 		if err != nil {
 			return err
 		}
+
 		location := Location{}
-		json.Unmarshal(body, &location)
+		err = json.Unmarshal(body, &location)
+		if err != nil {
+			return err
+		}
 
 		for _, encounter := range location.PokemonEncounters {
 			fmt.Println(encounter.Pokemon.Name)
@@ -416,8 +430,12 @@ func GetCatchPokemon(conf *config, cache *internal.Cache) func() error {
 		if err != nil {
 			return err
 		}
+
 		pokemon := Pokemon{}
-		json.Unmarshal(body, &pokemon)
+		err = json.Unmarshal(body, &pokemon)
+		if err != nil {
+			return err
+		}
 
 		catchPokemon(pokemon, conf.pokedex)
 

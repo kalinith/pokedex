@@ -44,6 +44,17 @@ func cleanInput(text string) []string {
 	return output
 }
 
+func printPokedex(config *config) func() error {
+    return func() error {
+    	fmt.Println("Your Pokedex:")
+    	for _, pokemon := range config.pokedex {
+    		fmt.Printf(" - %s\n", pokemon.Name)
+    	}
+    	return nil
+    }
+	
+}
+
 func main() {
 	// Step 1: Declare an empty map
 	m := make(map[string]cliCommand)
@@ -104,6 +115,11 @@ func main() {
 		description: "inspect the details of a caught pokemon",
 		config:		 visconf,
 		callback:	 inspectPokemon(visconf),
+	}
+	m["pokedex"] = cliCommand{
+		name:		 "pokedex",
+		description: "print a list of the names of pokemon you have caught",
+		callback:	 printPokedex(visconf),
 	}
 	
 	input := bufio.NewScanner(os.Stdin)
