@@ -99,6 +99,12 @@ func main() {
 		config:		 visconf,
 		callback:    GetCatchPokemon(visconf, cache),
 	}
+	m["inspect"] = cliCommand{
+		name:		 "inspect {pokemon}",
+		description: "inspect the details of a caught pokemon",
+		config:		 visconf,
+		callback:	 inspectPokemon(visconf),
+	}
 	
 	input := bufio.NewScanner(os.Stdin)
 	commands := []string{}

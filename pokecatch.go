@@ -31,3 +31,29 @@ func catchPokemon(pokemon Pokemon, pokedex map[string]Pokemon) {
 	return
 }
 
+func inspectPokemon(config *config) func() error {
+	return func () error {
+		pokemon := config.param
+		if pokemon == "" {
+			fmt.Println("No pokemon entered")
+			return nil
+		}
+	
+		data, exists := config.pokedex[pokemon]
+		if !exists {
+			//fmt.Printf("You haven't caught a %s yet\n", pokemon)
+			fmt.Println("you have not caught that pokemon")
+			return nil
+		}
+		fmt.Printf("Name: %s\nHeight: %d\nWeight: %d\nStats:\n",data.Name, data.Height, data.Weight)
+		//, stats and type(s)
+		for _, stat := range data.Stats {
+			fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+		}
+		fmt.Println("Types:")
+		for _, element := range data.Types {
+			fmt.Printf("  - %s\n", element.Type.Name)
+		}
+		return nil
+	}
+}
