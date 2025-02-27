@@ -10,7 +10,8 @@ import ("strings"
 type config struct {
 	prev		string
 	next		string
-	location	string
+	param		string
+	pokedex		map[string]Pokemon
 }
 
 type cliCommand struct {
@@ -46,16 +47,19 @@ func cleanInput(text string) []string {
 func main() {
 	// Step 1: Declare an empty map
 	m := make(map[string]cliCommand)
+	pokedex := make(map[string]Pokemon)
 	//declare configs
 	exitconf := &config{}
 	helpconf := &config{}
 	locconf  := &config{
 				prev: "",
-				next: "https://pokeapi.co/api/v2/location-area"}
+				next: "https://pokeapi.co/api/v2/location-area",
+			}
 	visconf := &config{
-				prev: "https://pokeapi.co/api/v2/location-area",
-				next: ""}
-	
+				param: "",
+				pokedex: pokedex,
+			}
+
 	cache := internal.NewCache(15 * time.Second)
 
 	// Step 2: Now add commands to the map, using the completed map
@@ -86,11 +90,16 @@ func main() {
 	m["explore"] = cliCommand{
 		name:		 "explore {location}",
 		description: "Explore the given location",
-		config:		 locconf,
+		config:		 visconf,
 		callback:    GetLocationData(visconf, cache),
 	}
+	m["catch"] = cliCommand{
+		name:		 "catch {pokemon}",
+		description: "attempt to catch a pokemon",
+		config:		 visconf,
+		callback:    GetCatchPokemon(visconf, cache),
+	}
 	
-
 	input := bufio.NewScanner(os.Stdin)
 	commands := []string{}
 	text := ""
@@ -104,7 +113,7 @@ func main() {
 		if len(commands) > 0 {
 			command = commands[0]
 			if len(commands) > 1 {
-				visconf.next = commands[1]
+				visconf.param = commands[1]
 			}
 			_, exists := m[command]
 			if exists {
@@ -116,6 +125,7 @@ func main() {
 			} else {
 				fmt.Println("Unknown command")
 			}
+		visconf.param = ""
 		}
 	}
 }
